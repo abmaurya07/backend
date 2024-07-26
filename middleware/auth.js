@@ -1,13 +1,13 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const cookieParser = require('cookie-parser');
 
 const auth = async (req, res, next) => {
-  // Use cookie-parser middleware to parse cookies
-  cookieParser()(req, res, () => {});
+
 
   // Retrieve the token from cookies
   const token = req.cookies.token;
+
+  console.log('Token:', token);
 
   if (!token) {
     return res.status(401).json({ message: 'No token, authorization denied' });

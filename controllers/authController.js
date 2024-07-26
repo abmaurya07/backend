@@ -4,7 +4,6 @@ const bcrypt = require('bcryptjs');
 
 const jwtSecret = process.env.JWT_SECRET;
 const jwtRefreshSecret = process.env.JWT_REFRESH_SECRET;
- 
 
 exports.signup = async (req, res) => {
   try {
@@ -13,7 +12,19 @@ exports.signup = async (req, res) => {
     await user.save();
     const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '1h' });
     const refreshToken = jwt.sign({ id: user._id }, jwtRefreshSecret, { expiresIn: '7d' });
-    res.status(201).json({ token, refreshToken });
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'None',
+      maxAge: 3600000, // 1 hour
+    });
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'None',
+      maxAge: 604800000, // 7 days
+    });
+    res.status(201).json({ message: 'User created successfully' });
   } catch (error) {
     console.log('Error:', error);
     res.status(500).json({ error: error.message });
@@ -29,21 +40,38 @@ exports.login = async (req, res) => {
     }
     const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '1h' });
     const refreshToken = jwt.sign({ id: user._id }, jwtRefreshSecret, { expiresIn: '7d' });
-    res.status(200).json({ token, refreshToken });
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'None',
+      maxAge: 3600000, // 1 hour
+    });
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'None',
+      maxAge: 604800000, // 7 days
+    });
+    res.status(200).json({ message: 'Login successful', username: user.username });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-
 exports.refreshToken = async (req, res) => {
-  const { token } = req.body;
+  const { token } = req.cookies.refreshToken; // Retrieve the refresh token from cookies
   if (!token) return res.status(401).json({ message: 'Unauthorized' });
 
   try {
     const payload = jwt.verify(token, jwtRefreshSecret);
     const newToken = jwt.sign({ id: payload.id }, jwtSecret, { expiresIn: '1h' });
-    res.status(200).json({ token: newToken });
+    res.cookie('token', newToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'None',
+      maxAge: 3600000, // 1 hour
+    });
+    res.status(200).json({ message: 'Token refreshed' });
   } catch (error) {
     res.status(401).json({ message: 'Unauthorized' });
   }
