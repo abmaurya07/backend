@@ -13,6 +13,7 @@ exports.signup = async (req, res) => {
     const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '1h' });
     const refreshToken = jwt.sign({ id: user._id }, jwtRefreshSecret, { expiresIn: '7d' });
     res.cookie('token', token, {
+      path: '/',
       httpOnly: true,
       secure: true,
       sameSite: 'None',
@@ -41,12 +42,14 @@ exports.login = async (req, res) => {
     const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '1h' });
     const refreshToken = jwt.sign({ id: user._id }, jwtRefreshSecret, { expiresIn: '7d' });
     res.cookie('token', token, {
+      path: '/',
       httpOnly: true,
       secure: true,
       sameSite: 'None',
       maxAge: 3600000, // 1 hour
     });
     res.cookie('refreshToken', refreshToken, {
+      path: '/',
       httpOnly: true,
       secure: true,
       sameSite: 'None',
@@ -66,6 +69,7 @@ exports.refreshToken = async (req, res) => {
     const payload = jwt.verify(token, jwtRefreshSecret);
     const newToken = jwt.sign({ id: payload.id }, jwtSecret, { expiresIn: '1h' });
     res.cookie('token', newToken, {
+      path: '/',
       httpOnly: true,
       secure: true,
       sameSite: 'None',
