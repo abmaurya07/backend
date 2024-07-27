@@ -5,6 +5,8 @@ const auth = async (req, res, next) => {
 
 
   // Retrieve the token from cookies
+  console.log('req', req)
+  console.log('req', req?.Cookie)
   const token = req.cookies.token;
 
   console.log('Token:', token);
