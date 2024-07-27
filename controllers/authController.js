@@ -8,12 +8,20 @@ const jwtRefreshSecret = process.env.JWT_REFRESH_SECRET;
 exports.signup = async (req, res) => {
   try {
     const { username, password } = req.body;
+
+    // Check if the username already exists
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return res.status(409).json({ error: 'Username already exists' });
+    }
+
+    // If not, create a new user
     const user = new User({ username, password });
     await user.save();
     const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '1h' });
     const refreshToken = jwt.sign({ id: user._id }, jwtRefreshSecret, { expiresIn: '7d' });
- 
-    res.status(201).json({ message: 'User created successfully' });
+
+    res.status(201).json({ message: 'User created successfully', token, refreshToken });
   } catch (error) {
     console.log('Error:', error);
     res.status(500).json({ error: error.message });
