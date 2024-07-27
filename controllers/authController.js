@@ -12,19 +12,7 @@ exports.signup = async (req, res) => {
     await user.save();
     const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '1h' });
     const refreshToken = jwt.sign({ id: user._id }, jwtRefreshSecret, { expiresIn: '7d' });
-    res.cookie('token', token, {
-      path: '/',
-      httpOnly: true,
-      secure: true,
-      sameSite: 'None',
-      maxAge: 3600000, // 1 hour
-    });
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'None',
-      maxAge: 604800000, // 7 days
-    });
+ 
     res.status(201).json({ message: 'User created successfully' });
   } catch (error) {
     console.log('Error:', error);
@@ -41,21 +29,8 @@ exports.login = async (req, res) => {
     }
     const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '1h' });
     const refreshToken = jwt.sign({ id: user._id }, jwtRefreshSecret, { expiresIn: '7d' });
-    res.cookie('token', token, {
-      path: '/',
-      httpOnly: true,
-      secure: true,
-      sameSite: 'None',
-      maxAge: 3600000, // 1 hour
-    });
-    res.cookie('refreshToken', refreshToken, {
-      path: '/',
-      httpOnly: true,
-      secure: true,
-      sameSite: 'None',
-      maxAge: 604800000, // 7 days
-    });
-    res.status(200).json({ message: 'Login successful', username: user.username });
+
+    res.status(200).json({ message: 'Login successful', username: user.username, token, refreshToken });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
