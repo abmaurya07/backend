@@ -1,323 +1,97 @@
-# Task Manager API Documentation
+# Task Management Backend
 
-## Overview
-The Task Manager API allows users to manage their tasks effectively. It includes user authentication (signup and login), task management (create, read, update, delete), and task categorization (To Do, In Progress, Done). The API is built using Node.js, Express, and MongoDB. It also includes JWT-based authentication and bcrypt for password hashing.
+## Introduction
+This is the backend server for the Task Management App. It is built using Node.js, Express, and MongoDB. The server handles user authentication, task management, and serves API endpoints for the frontend application.
 
-## Authentication
+## Table of Contents
+- [Introduction](#introduction)
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [API Endpoints](#api-endpoints)
+- [Configuration](#configuration)
+- [Dependencies](#dependencies)
+- [Troubleshooting](#troubleshooting)
+- [Contributors](#contributors)
+- [License](#license)
 
-### Signup
-**Endpoint:** \`POST /api/signup\`
+## Features
+- User authentication with JWT tokens
+- Password encryption using bcrypt
+- Task creation, updating, deletion, and fetching
+- Middleware for authentication
+- Structured using MVC architecture
 
-**Description:** Registers a new user and returns a JWT token.
+## Installation
+To install and run the backend server locally, follow these steps:
 
-**Request Body:**
-\`\`\`json
-{
-  "username": "string",
-  "password": "string"
-}
-\`\`\`
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/abmaurya07/backend-for-taskmanagement/
+    ```
+2. Navigate to the project directory:
+    ```bash
+    cd backend-for-taskmanagement
+    ```
+3. Install the dependencies:
+    ```bash
+    npm install
+    ```
+4. Create a `.env` file in the root directory and add the following:
+    ```plaintext
+    PORT=5000
+   MONGO_URI=<your-mongodb-connection-string>
+   JWT_SECRET=<your-jwt-secret>
+   JWT_REFRESH_SECRET=<your-jwt-refresh-secret>
+   CLIENT_URL=<localhost:3000 or production client url>
+    ```
 
-**Response:**
-- Success (201):
-  \`\`\`json
-  {
-    "token": "string"
-  }
-  \`\`\`
-- Error (500):
-  \`\`\`json
-  {
-    "error": "error message"
-  }
-  \`\`\`
+5. Start the server:
+    ```bash
+    npm start
+    ```
 
-### Login
-**Endpoint:** \`POST /api/login\`
+## Usage
+The backend server exposes a set of API endpoints to be used by the frontend application. Ensure that your MongoDB server is running and accessible with the connection string provided in the `.env` file.
 
-**Description:** Authenticates a user and returns a JWT token.
+## API Endpoints
+### Authentication
+- `POST /api/signup`: Register a new user
+- `POST /api/login`: User login
+- `POST /api/refreshToken`: Refresh JWT token
 
-**Request Body:**
-\`\`\`json
-{
-  "username": "string",
-  "password": "string"
-}
-\`\`\`
+### Tasks
+- `POST /api/tasks/addTask`: Add a new task
+- `POST /api/tasks/bulkDelete`: Bulk delete tasks
+- `DELETE /api/tasks/deleteTask`: Delete a task
+- `GET /api/tasks/fetchTasks`: Fetch all tasks
+- `GET /api/tasks/taskSummary`: Get task summary
+- `PUT /api/tasks/updateTask`: Update a task
+- `PUT /api/tasks/updateTaskStatus`: Update task status
 
-**Response:**
-- Success (200):
-  \`\`\`json
-  {
-    "token": "string"
-  }
-  \`\`\`
-- Error (400):
-  \`\`\`json
-  {
-    "message": "Invalid credentials"
-  }
-  \`\`\`
-- Error (500):
-  \`\`\`json
-  {
-    "error": "error message"
-  }
-  \`\`\`
+## Configuration
+Sensitive data and configuration values are stored in environment variables. Create a `.env` file in the root directory and add your configuration values.
 
-## Task Management
+`.env` file structure:
+```plaintext
+PORT=5000
+MONGO_URI=<your-mongodb-connection-string>
+JWT_SECRET=<your-jwt-secret>
+JWT_REFRESH_SECRET=<your-jwt-refresh-secret>
+CLIENT_URL=<localhost:3000 or production client url>
+```
+## Dependencies
+- [Node.js](https://nodejs.org/)
+- [Express](https://expressjs.com/)
+- [Mongoose](https://mongoosejs.com/)
+- [Bcrypt](https://www.npmjs.com/package/bcrypt)
+- [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken)
+- [dotenv](https://www.npmjs.com/package/dotenv)
 
-### Create Task
-**Endpoint:** \`POST /api/tasks\`
+## Troubleshooting
+- Ensure all environment variables are correctly set in the `.env` file.
+- Make sure the MongoDB server is running and accessible at the URL specified in the environment variables.
+- Verify that all required dependencies are installed by running `npm install`.
 
-**Description:** Creates a new task.
-
-**Request Headers:**
-- \`Authorization: Bearer <token>\`
-
-**Request Body:**
-\`\`\`json
-{
-  "title": "string",
-  "description": "string",
-  "status": "string",
-  "dueDate": "date"
-}
-\`\`\`
-
-**Response:**
-- Success (201):
-  \`\`\`json
-  {
-    "task": {
-      "_id": "string",
-      "title": "string",
-      "description": "string",
-      "status": "string",
-      "dueDate": "date",
-      "user": "string",
-      "createdAt": "date",
-      "updatedAt": "date"
-    }
-  }
-  \`\`\`
-- Error (500):
-  \`\`\`json
-  {
-    "error": "error message"
-  }
-  \`\`\`
-
-### Get Tasks
-**Endpoint:** \`GET /api/tasks\`
-
-**Description:** Retrieves a paginated list of all tasks for the authenticated user.
-
-**Request Headers:**
-- \`Authorization: Bearer <token>\`
-
-**Query Parameters:**
-- \`page\` (optional, default: 1)
-- \`limit\` (optional, default: 10)
-
-**Response:**
-- Success (200):
-  \`\`\`json
-  [
-    {
-      "_id": "string",
-      "title": "string",
-      "description": "string",
-      "status": "string",
-      "dueDate": "date",
-      "user": "string",
-      "createdAt": "date",
-      "updatedAt": "date"
-    }
-  ]
-  \`\`\`
-- Error (500):
-  \`\`\`json
-  {
-    "error": "error message"
-  }
-  \`\`\`
-
-### Get Tasks by Status
-**Endpoint:** \`GET /api/tasks/{status}\`
-
-**Description:** Retrieves a paginated list of tasks by status (To Do, In Progress, Done) for the authenticated user.
-
-**Request Headers:**
-- \`Authorization: Bearer <token>\`
-
-**Query Parameters:**
-- \`page\` (optional, default: 1)
-- \`limit\` (optional, default: 10)
-
-**Response:**
-- Success (200):
-  \`\`\`json
-  [
-    {
-      "_id": "string",
-      "title": "string",
-      "description": "string",
-      "status": "string",
-      "dueDate": "date",
-      "user": "string",
-      "createdAt": "date",
-      "updatedAt": "date"
-    }
-  ]
-  \`\`\`
-- Error (500):
-  \`\`\`json
-  {
-    "error": "error message"
-  }
-  \`\`\`
-
-### Update Task
-**Endpoint:** \`PUT /api/tasks/:id\`
-
-**Description:** Updates a task by ID.
-
-**Request Headers:**
-- \`Authorization: Bearer <token>\`
-
-**Request Body:**
-\`\`\`json
-{
-  "title": "string",
-  "description": "string",
-  "status": "string",
-  "dueDate": "date"
-}
-\`\`\`
-
-**Response:**
-- Success (200):
-  \`\`\`json
-  {
-    "task": {
-      "_id": "string",
-      "title": "string",
-      "description": "string",
-      "status": "string",
-      "dueDate": "date",
-      "user": "string",
-      "createdAt": "date",
-      "updatedAt": "date"
-    }
-  }
-  \`\`\`
-- Error (404):
-  \`\`\`json
-  {
-    "message": "Task not found or not authorized"
-  }
-  \`\`\`
-- Error (500):
-  \`\`\`json
-  {
-    "error": "error message"
-  }
-  \`\`\`
-
-### Delete Task
-**Endpoint:** \`DELETE /api/tasks/:id\`
-
-**Description:** Deletes a task by ID.
-
-**Request Headers:**
-- \`Authorization: Bearer <token>\`
-
-**Response:**
-- Success (204):
-  \`\`\`json
-  {
-    "message": "Task deleted"
-  }
-  \`\`\`
-- Error (404):
-  \`\`\`json
-  {
-    "message": "Task not found or not authorized"
-  }
-  \`\`\`
-- Error (500):
-  \`\`\`json
-  {
-    "error": "error message"
-  }
-  \`\`\`
-
-### Bulk Delete Tasks
-**Endpoint:** \`DELETE /api/tasks/bulk-delete\`
-
-**Description:** Deletes multiple tasks by IDs.
-
-**Request Headers:**
-- \`Authorization: Bearer <token>\`
-
-**Request Body:**
-\`\`\`json
-{
-  "ids": ["string", "string"]
-}
-\`\`\`
-
-**Response:**
-- Success (200):
-  \`\`\`json
-  {
-    "message": "Tasks deleted successfully"
-  }
-  \`\`\`
-- Error (400):
-  \`\`\`json
-  {
-    "message": "Invalid data format"
-  }
-  \`\`\`
-- Error (404):
-  \`\`\`json
-  {
-    "message": "No tasks found or not authorized"
-  }
-  \`\`\`
-- Error (500):
-  \`\`\`json
-  {
-    "message": "Server error",
-    "error": "error details"
-  }
-  \`\`\`
-
-### Task Summary
-**Endpoint:** \`GET /api/tasks/summary\`
-
-**Description:** Retrieves a summary of tasks categorized by their status.
-
-**Request Headers:**
-- \`Authorization: Bearer <token>\`
-
-**Response:**
-- Success (200):
-  \`\`\`json
-  {
-    "taskSummary": {
-      "All": "number",
-      "To Do": "number",
-      "In Progress": "number",
-      "Done": "number"
-    }
-  }
-  \`\`\`
-- Error (500):
-  \`\`\`json
-  {
-    "error": "error message"
-  }
-  \`\`\`
+## Contributors
+- [Abhishek Maurya](https://github.com/abmaurya07)
