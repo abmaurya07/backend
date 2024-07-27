@@ -5,8 +5,7 @@ const auth = async (req, res, next) => {
 
 
   // Retrieve the token from cookies
-  const ref = req.headers.Cookie
-  console.log('ref:', ref)
+
   const token = req.cookies.token;
 
   console.log('Token:', token);
