@@ -54,7 +54,8 @@ exports.refreshToken = async (req, res) => {
   try {
     const payload = jwt.verify(token, jwtRefreshSecret);
     const newToken = jwt.sign({ id: payload.id }, jwtSecret, { expiresIn: '1h' });
-    res.status(200).json({ message: 'Token refreshed', token: newToken });
+    const user = await User.findById(payload.id).select('-password');
+    res.status(200).json({ message: 'Token refreshed',username: user.username, token: newToken });
   } catch (error) {
     res.status(401).json({ message: 'Unauthorized'});
   }
