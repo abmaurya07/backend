@@ -3,6 +3,9 @@ const mongoose = require('mongoose');
 
 exports.createTask = async (req, res) => {
   try {
+    console.log('create task called');
+    console.log('req.user.id:', req.user.id);
+    console.log('req.body:', req.body);
     const task = new Task({ ...req.body, user: req.user.id });
     await task.save();
     res.status(201).json(task);
